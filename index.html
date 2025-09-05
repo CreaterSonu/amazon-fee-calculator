@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amazon Seller Fee Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f9f9f9 0%, #e6f0ff 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: linear-gradient(to right, #232f3e, #37475A);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            color: #ccc;
+        }
+        
+        .calculator-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .input-section {
+            flex: 1;
+            min-width: 350px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .result-section {
+            flex: 1;
+            min-width: 350px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .section-title {
+            color: #232f3e;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ff9900;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #232f3e;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #ff9900;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 153, 0, 0.2);
+        }
+        
+        button {
+            background: linear-gradient(to right, #ff9900, #ffad33);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: linear-gradient(to right, #e88a00, #ff9900);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: #232f3e;
+        }
+        
+        .result-value {
+            font-weight: 600;
+            color: #ff9900;
+        }
+        
+        .total {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+            font-size: 1.25rem;
+        }
+        
+        .gst-note {
+            background: #f2f6ff;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #666;
+            border-left: 4px solid #37475A;
+        }
+        
+        .fee-breakdown {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+        
+        .fee-breakdown h3 {
+            margin-bottom: 20px;
+            color: #232f3e;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ff9900;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f5f8ff;
+            font-weight: 600;
+            color: #232f3e;
+        }
+        
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .calculator-container {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Amazon Seller Fee Calculator</h1>
+            <p class="description">Calculate all Amazon seller fees including GST for your products</p>
+        </header>
+        
+        <div class="calculator-container">
+            <div class="input-section">
+                <h2 class="section-title">Enter Product Details</h2>
+                <div class="form-group">
+                    <label for="price">Selling Price (₹)</label>
+                    <input type="number" id="price" placeholder="Enter product price" min="0" step="1" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="weight">Weight (grams)</label>
+                    <input type="number" id="weight" placeholder="Enter product weight" min="0" step="1" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="category">Product Category</label>
+                    <select id="category">
+                        <option value="books">Books</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="home">Home &amp; Kitchen</option>
+                        <option value="fashion">Fashion</option>
+                        <option value="other">Other Categories</option>
+                    </select>
+                </div>
+                
+                <button id="calculate-btn">Calculate Fees</button>
+                
+                <div class="gst-note">
+                    <p><strong>Note:</strong> GST is calculated at 18% on referral fees, closing fees, and shipping fees.</p>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <h2 class="section-title">Fee Breakdown</h2>
+                <div class="result-item">
+                    <span class="result-label">Referral Fee:</span>
+                    <span class="result-value" id="referral-fee">₹ 0.00</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">Closing Fee:</span>
+                    <span class="result-value" id="closing-fee">₹ 0.00</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">Shipping Fee:</span>
+                    <span class="result-value" id="shipping-fee">₹ 0.00</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">GST on Fees (18%):</span>
+                    <span class="result-value" id="gst-fee">₹ 0.00</span>
+                </div>
+                
+                <div class="result-item total">
+                    <span class="result-label">Total Fees:</span>
+                    <span class="result-value" id="total-fees">₹ 0.00</span>
+                </div>
+                
+                <div class="result-item total">
+                    <span class="result-label">Your Earnings:</span>
+                    <span class="result-value" id="earnings">₹ 0.00</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="fee-breakdown">
+            <h3>Fee Structure Reference</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fee Type</th>
+                        <th>Condition</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="4">Referral Fee (Books)</td>
+                        <td>Item price ≤ ₹250</td>
+                        <td>3%</td>
+                    </tr>
+                    <tr>
+                        <td>₹250 &lt; Item price ≤ ₹500</td>
+                        <td>4.5%</td>
+                    </tr>
+                    <tr>
+                        <td>₹500 &lt; Item price ≤ ₹1000</td>
+                        <td>9%</td>
+                    </tr>
+                    <tr>
+                        <td>Item price &gt; ₹1000</td>
+                        <td>13.5%</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">Closing Fee</td>
+                        <td>₹0 - ₹300</td>
+                        <td>₹6</td>
+                    </tr>
+                    <tr>
+                        <td>₹301 - ₹500</td>
+                        <td>₹11</td>
+                    </tr>
+                    <tr>
+                        <td>₹501 - ₹1000</td>
+                        <td>₹34</td>
+                    </tr>
+                    <tr>
+                        <td>Above ₹1000</td>
+                        <td>₹65</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">Shipping Fee</td>
+                        <td>First 500g</td>
+                        <td>₹65</td>
+                    </tr>
+                    <tr>
+                        <td>500g - 1kg</td>
+                        <td>₹85</td>
+                    </tr>
+                    <tr>
+                        <td>1kg - 2kg</td>
+                        <td>₹122</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="gst-note">
+                <p><strong>GST Information:</strong> Amazon charges 18% GST on the referral fees, closing fees, and shipping fees. This is in addition to the base fees.</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Note: This calculator provides an estimate based on Amazon's fee structure. Actual fees may vary.</p>
+            <p>© 2023 Amazon Seller Fee Calculator | Includes GST Calculation</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calculateBtn = document.getElementById('calculate-btn');
+            
+            calculateBtn.addEventListener('click', function() {
+                // Get input values
+                const price = parseFloat(document.getElementById('price').value) || 0;
+                const weight = parseFloat(document.getElementById('weight').value) || 0;
+                const category = document.getElementById('category').value;
+                
+                // Calculate base fees
+                const referralFee = calculateReferralFee(price, category);
+                const closingFee = calculateClosingFee(price);
+                const shippingFee = calculateShippingFee(weight);
+                
+                // Calculate GST (18% on all fees)
+                const gst = (referralFee + closingFee + shippingFee) * 0.18;
+                
+                // Calculate total fees including GST
+                const totalFees = referralFee + closingFee + shippingFee + gst;
+                const earnings = price - totalFees;
+                
+                // Update UI
+                document.getElementById('referral-fee').textContent = '₹ ' + referralFee.toFixed(2);
+                document.getElementById('closing-fee').textContent = '₹ ' + closingFee.toFixed(2);
+                document.getElementById('shipping-fee').textContent = '₹ ' + shippingFee.toFixed(2);
+                document.getElementById('gst-fee').textContent = '₹ ' + gst.toFixed(2);
+                document.getElementById('total-fees').textContent = '₹ ' + totalFees.toFixed(2);
+                document.getElementById('earnings').textContent = '₹ ' + earnings.toFixed(2);
+            });
+            
+            function calculateReferralFee(price, category) {
+                if (category === 'books') {
+                    if (price <= 250) {
+                        return price * 0.03;
+                    } else if (price > 250 && price <= 500) {
+                        return price * 0.045;
+                    } else if (price > 500 && price <= 1000) {
+                        return price * 0.09;
+                    } else {
+                        return price * 0.135;
+                    }
+                } else {
+                    // For other categories, using a standard 15% referral fee
+                    return price * 0.15;
+                }
+            }
+            
+            function calculateClosingFee(price) {
+                if (price <= 300) {
+                    return 6;
+                } else if (price > 300 && price <= 500) {
+                    return 11;
+                } else if (price > 500 && price <= 1000) {
+                    return 34;
+                } else {
+                    return 65;
+                }
+            }
+            
+            function calculateShippingFee(weight) {
+                // Convert weight to kilograms for calculation
+                const weightKg = weight / 1000;
+                
+                if (weightKg <= 0.5) {
+                    return 65;
+                } else if (weightKg > 0.5 && weightKg <= 1) {
+                    return 85;
+                } else if (weightKg > 1 && weightKg <= 2) {
+                    return 122;
+                } else {
+                    // For weights above 2kg, using ₹122 + ₹40 for each additional kg
+                    return 122 + Math.ceil(weightKg - 2) * 40;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
